@@ -130,18 +130,22 @@ module Mocks
     end
 
     def self.for(name)
-      RESETTERS[self.name] ||= -> { self.reset! }
-      instances[name] = instances.fetch(name) {
+      RESETTERS[self.name] ||= -> { Instances.reset! }
+      Instances.instances[name] = Instances.instances.fetch(name) {
         new(name)
       }
     end
 
-    def self.instances
-      @@_instances ||= reset!
-    end
+    module Instances
+      extend self
 
-    def self.reset!
-      @@_instances = {} of String => self
+      def instances
+        @@_instances ||= reset!
+      end
+
+      def reset!
+        @@_instances = {} of String => Method(T)
+      end
     end
 
     @methods : Hash(String, Method(T))
